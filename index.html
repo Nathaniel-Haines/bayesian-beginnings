@@ -6,6 +6,10 @@
 <title>Bayesian Beginnings — Statistical & Computational Modeling Consulting</title>
 <meta name="description" content="Bayesian Beginnings is a consulting practice helping academic researchers build rigorous Bayesian models, computational pipelines, and reproducible workflows in R and Python.">
 
+<!-- Favicon (inline SVG of the mark) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%231a1a1a' rx='8'/><g><circle cx='16' cy='22' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/><line x1='21' y1='22' x2='38' y2='22' stroke='%23f3efe7' stroke-width='2'/><circle cx='43' cy='22' r='5' fill='%23f3efe7'/><circle cx='21' cy='42' r='5' fill='%23f3efe7'/><line x1='26' y1='42' x2='43' y2='42' stroke='%23f3efe7' stroke-width='2'/><circle cx='48' cy='42' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/></g></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%231a1a1a' rx='8'/><g><circle cx='16' cy='22' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/><line x1='21' y1='22' x2='38' y2='22' stroke='%23f3efe7' stroke-width='2'/><circle cx='43' cy='22' r='5' fill='%23f3efe7'/><circle cx='21' cy='42' r='5' fill='%23f3efe7'/><line x1='26' y1='42' x2='43' y2='42' stroke='%23f3efe7' stroke-width='2'/><circle cx='48' cy='42' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/></g></svg>">
+
 <!-- Fonts: Fraunces (variable serif) + General Sans (body) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -194,11 +198,116 @@ h1.hero-title em {
   justify-content: center;
   align-items: center;
 }
-.hero-mark svg {
+.logo-mark {
   width: 100%;
-  max-width: 320px;
+  max-width: 380px;
   height: auto;
-  opacity: 0.92;
+  overflow: visible;
+}
+
+/* OPEN CIRCLES = observations / priors. Present from the start.
+   fill: bg (not none) so bars passing behind don't show through. */
+.logo-mark .open {
+  fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 5;
+  opacity: 0;
+  animation: fade-in 0.6s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+/* BARS emerge from the open-circle endpoint outward.
+   Rows 1,3,5 (i=0,2,4): open on LEFT, draw L→R, dashoffset goes +len → 0.
+   Rows 2,4 (i=1,3): open on RIGHT, draw R→L, dashoffset goes -len → 0. */
+.logo-mark .bar {
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: draw-LR 0.7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+  animation-delay: calc(0.5s + var(--i) * 0.22s);
+}
+.logo-mark .pair:nth-child(2) .bar,
+.logo-mark .pair:nth-child(4) .bar {
+  stroke-dashoffset: -600;
+  animation-name: draw-RL;
+}
+
+/* FILLED CIRCLES = posterior estimates. Materialize at bar's destination
+   after the bar finishes drawing. Brief scale-in with overshoot. */
+.logo-mark .fill {
+  fill: var(--ink);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: materialize 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(0.5s + var(--i) * 0.22s + 0.6s);
+}
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+@keyframes draw-LR {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes draw-RL {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes materialize {
+  0%   { opacity: 0; transform: scale(0.2); }
+  70%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* HOVER: replay the initial estimation sequence.
+   We use a .replay class (toggled by JS) with distinct animation names
+   so the browser actually registers the change and restarts. */
+.hero-mark.replay .logo-mark .open {
+  animation: fade-in-replay 0.6s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+.hero-mark.replay .logo-mark .bar {
+  animation: draw-LR-replay 0.7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+  animation-delay: calc(0.5s + var(--i) * 0.22s);
+}
+.hero-mark.replay .logo-mark .pair:nth-child(2) .bar,
+.hero-mark.replay .logo-mark .pair:nth-child(4) .bar {
+  animation-name: draw-RL-replay;
+}
+.hero-mark.replay .logo-mark .fill {
+  animation: materialize-replay 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: calc(0.5s + var(--i) * 0.22s + 0.6s);
+}
+
+/* Replay keyframes — identical to originals but with distinct names.
+   Each one starts from the "hidden" state so the sequence actually replays. */
+@keyframes fade-in-replay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes draw-LR-replay {
+  from { stroke-dashoffset: 600; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes draw-RL-replay {
+  from { stroke-dashoffset: -600; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes materialize-replay {
+  0%   { opacity: 0; transform: scale(0.2); }
+  70%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .logo-mark .open,
+  .logo-mark .fill { opacity: 1; animation: none; }
+  .logo-mark .bar { stroke-dashoffset: 0; animation: none; }
+  .hero-mark.replay .logo-mark .open,
+  .hero-mark.replay .logo-mark .fill,
+  .hero-mark.replay .logo-mark .bar { animation: none; }
 }
 
 /* ---------- SECTION DIVIDER ---------- */
@@ -570,37 +679,46 @@ footer .social a:hover { color: var(--accent); }
       </a>
     </div>
     <div class="hero-mark">
-      <!-- Stylized logo art (5 connection pairs in scattered arrangement) -->
-      <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-label="Bayesian Beginnings logo">
-        <!-- Row 1 -->
-        <g>
-          <circle cx="60" cy="55" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
-          <line x1="74" y1="55" x2="126" y2="55" stroke="#f3efe7" stroke-width="2"/>
-          <circle cx="140" cy="55" r="14" fill="#e8e3d8"/>
+      <!-- Logo: open circles on two parallel diagonals (left/right edges of sheared rectangle).
+           Filled circles sit inboard, following a similar but noisier inner pattern. -->
+      <svg class="logo-mark" viewBox="0 0 660 660" xmlns="http://www.w3.org/2000/svg" aria-label="Bayesian Beginnings logo">
+        <!-- Parallelogram geometry: left edge (rows 1,3,5 opens) and
+             right edge (rows 2,4 opens) share slope dx/dy = -0.208.
+             Filled circles follow inner parallel lines with small noise. -->
+
+        <!-- Row 1: open LEFT (148, 87)  | filled (305, 87) -->
+        <g class="pair" style="--i:0">
+          <line class="bar" x1="148" y1="87" x2="305" y2="87"/>
+          <circle class="fill" cx="305" cy="87" r="32"/>
+          <circle class="open" cx="148" cy="87" r="28"/>
         </g>
-        <!-- Row 2 -->
-        <g>
-          <circle cx="180" cy="110" r="14" fill="#e8e3d8"/>
-          <line x1="194" y1="110" x2="246" y2="110" stroke="#f3efe7" stroke-width="2"/>
-          <circle cx="260" cy="110" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+
+        <!-- Row 2: open RIGHT (548, 195) | filled (375, 195) -->
+        <g class="pair" style="--i:1">
+          <line class="bar" x1="375" y1="195" x2="548" y2="195"/>
+          <circle class="fill" cx="375" cy="195" r="32"/>
+          <circle class="open" cx="548" cy="195" r="28"/>
         </g>
-        <!-- Row 3 -->
-        <g>
-          <circle cx="40" cy="170" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
-          <line x1="54" y1="170" x2="126" y2="170" stroke="#f3efe7" stroke-width="2"/>
-          <circle cx="140" cy="170" r="14" fill="#e8e3d8"/>
+
+        <!-- Row 3: open LEFT (100, 318) | filled (272, 318) -->
+        <g class="pair" style="--i:2">
+          <line class="bar" x1="100" y1="318" x2="272" y2="318"/>
+          <circle class="fill" cx="272" cy="318" r="32"/>
+          <circle class="open" cx="100" cy="318" r="28"/>
         </g>
-        <!-- Row 4 -->
-        <g>
-          <circle cx="190" cy="225" r="14" fill="#e8e3d8"/>
-          <line x1="204" y1="225" x2="246" y2="225" stroke="#f3efe7" stroke-width="2"/>
-          <circle cx="260" cy="225" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+
+        <!-- Row 4: open RIGHT (498, 433) | filled (330, 433) -->
+        <g class="pair" style="--i:3">
+          <line class="bar" x1="330" y1="433" x2="498" y2="433"/>
+          <circle class="fill" cx="330" cy="433" r="32"/>
+          <circle class="open" cx="498" cy="433" r="28"/>
         </g>
-        <!-- Row 5 -->
-        <g>
-          <circle cx="40" cy="280" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
-          <line x1="54" y1="280" x2="126" y2="280" stroke="#f3efe7" stroke-width="2"/>
-          <circle cx="140" cy="280" r="14" fill="#e8e3d8"/>
+
+        <!-- Row 5: open LEFT (50, 558)  | filled (228, 558) -->
+        <g class="pair" style="--i:4">
+          <line class="bar" x1="50" y1="558" x2="228" y2="558"/>
+          <circle class="fill" cx="228" cy="558" r="32"/>
+          <circle class="open" cx="50" cy="558" r="28"/>
         </g>
       </svg>
     </div>
@@ -796,7 +914,7 @@ footer .social a:hover { color: var(--accent); }
     <div class="section-label" style="text-align:center; display:block;">06 / Contact</div>
     <h2>Have a project worth <em>doing right</em>?</h2>
     <p>The best starting point is an email with a few sentences on what you're working on, what stage it's at, and what you're hoping to figure out. I usually reply within a couple of days.</p>
-    <a class="contact-email" href="mailto:hello@bayesianbeginnings.com">hello@bayesianbeginnings.com</a>
+    <a class="contact-email" href="mailto:nathaniel.b.haines@gmail.com">nathaniel.b.haines@gmail.com</a>
   </div>
 </section>
 
@@ -819,6 +937,23 @@ footer .social a:hover { color: var(--accent); }
     if (window.scrollY > 20) nav.classList.add('scrolled');
     else nav.classList.remove('scrolled');
   });
+
+  // Replay logo animation on hover. Lock during playback so re-entering
+  // mid-sequence doesn't cut it off; total runtime ~1.95s.
+  const heroMark = document.querySelector('.hero-mark');
+  let replaying = false;
+  if (heroMark) {
+    heroMark.addEventListener('mouseenter', () => {
+      if (replaying) return;
+      replaying = true;
+      heroMark.classList.remove('replay');
+      // Force reflow so the browser registers the class removal
+      // before re-adding it, ensuring the animation restarts.
+      void heroMark.offsetWidth;
+      heroMark.classList.add('replay');
+      setTimeout(() => { replaying = false; }, 1950);
+    });
+  }
 </script>
 
 </body>
