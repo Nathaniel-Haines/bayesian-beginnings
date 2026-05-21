@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayesian Beginnings — Statistical & Computational Modeling Consulting</title>
+<meta name="description" content="Bayesian Beginnings is a consulting practice helping academic researchers build rigorous Bayesian models, computational pipelines, and reproducible workflows in R and Python.">
+
+<!-- Fonts: Fraunces (variable serif) + General Sans (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..800,30..100&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #1a1a1a;
+  --bg-2: #222222;
+  --ink: #f3efe7;
+  --ink-muted: #a8a298;
+  --rule: #3a3a3a;
+  --accent: #c9a96e;
+  --accent-dim: #8a7349;
+
+  --serif: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --sans: 'General Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --max-w: 1100px;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Subtle grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+.wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ---------- NAV ---------- */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+  background: rgba(26, 26, 26, 0.75);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+nav.scrolled { border-bottom-color: var(--rule); }
+nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+.nav-brand svg { display: block; }
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s ease;
+}
+.nav-links a:hover { color: var(--ink); }
+@media (max-width: 640px) {
+  .nav-links { display: none; }
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  padding: 8rem 0 4rem;
+  position: relative;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+@media (max-width: 880px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 3rem; }
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  margin-bottom: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+  display: inline-block;
+}
+h1.hero-title {
+  font-family: var(--serif);
+  font-weight: 350;
+  font-variation-settings: "opsz" 144, "SOFT" 80;
+  font-size: clamp(2.5rem, 6.5vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.75rem;
+}
+h1.hero-title em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: "opsz" 144, "SOFT" 100;
+}
+.hero-lede {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  max-width: 36ch;
+  margin-bottom: 2.5rem;
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.5rem;
+  border: 1px solid var(--ink);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
+}
+.cta:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+.cta-arrow { transition: transform 0.25s ease; }
+.cta:hover .cta-arrow { transform: translateX(4px); }
+
+/* Logo art in hero */
+.hero-mark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.hero-mark svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  opacity: 0.92;
+}
+
+/* ---------- SECTION DIVIDER ---------- */
+.divider {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
+.divider svg { opacity: 0.4; }
+
+/* ---------- SECTIONS ---------- */
+section {
+  padding: 5rem 0;
+}
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+h2.section-title {
+  font-family: var(--serif);
+  font-weight: 350;
+  font-variation-settings: "opsz" 144, "SOFT" 60;
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 3rem;
+  max-width: 22ch;
+}
+h2.section-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* ---------- SERVICES ---------- */
+.services {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.service {
+  padding: 2.5rem 2rem 2.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+}
+.service:nth-child(odd) { padding-right: 3rem; }
+.service:nth-child(even) {
+  padding-left: 3rem;
+  border-left: 1px solid var(--rule);
+}
+@media (max-width: 720px) {
+  .services { grid-template-columns: 1fr; }
+  .service, .service:nth-child(odd), .service:nth-child(even) {
+    padding: 2rem 0;
+    border-left: none;
+  }
+}
+.service-num {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent-dim);
+  margin-bottom: 1rem;
+}
+.service h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.55rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.9rem;
+}
+.service p {
+  color: var(--ink-muted);
+  font-size: 0.98rem;
+}
+
+/* ---------- ABOUT ---------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 4rem;
+}
+@media (max-width: 880px) {
+  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+.about-body p {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+}
+.about-body p:last-child { color: var(--ink-muted); }
+.about-meta {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.9;
+}
+.about-meta strong {
+  display: block;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 1.25rem;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.7rem;
+}
+.about-meta strong:first-child { margin-top: 0; }
+
+/* ---------- OPEN SOURCE ---------- */
+.os-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+@media (max-width: 720px) {
+  .os-grid { grid-template-columns: 1fr; }
+}
+.os-card {
+  border: 1px solid var(--rule);
+  padding: 2rem;
+  background: var(--bg-2);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+.os-card:hover {
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+}
+.os-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1rem;
+}
+.os-card h3 {
+  font-family: var(--mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.os-card-tag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.os-card p {
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+.os-card-link {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  border-bottom: 1px solid var(--accent-dim);
+  padding-bottom: 2px;
+  align-self: flex-start;
+  transition: border-color 0.2s ease;
+}
+.os-card-link:hover { border-color: var(--accent); }
+
+/* ---------- PRIOR WORK ---------- */
+.prior-list {
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+.prior-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 2rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+@media (max-width: 720px) {
+  .prior-item {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 1.5rem 0;
+  }
+}
+.prior-client {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+.prior-desc {
+  color: var(--ink-muted);
+  font-size: 0.98rem;
+}
+.prior-tag {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-align: right;
+}
+@media (max-width: 720px) { .prior-tag { text-align: left; } }
+
+/* ---------- WRITING ---------- */
+.writing-block {
+  border: 1px solid var(--rule);
+  padding: 3rem;
+  background: var(--bg-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+@media (max-width: 720px) {
+  .writing-block {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem;
+  }
+}
+.writing-block-text h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.writing-block-text p {
+  color: var(--ink-muted);
+  max-width: 50ch;
+  font-size: 0.98rem;
+}
+
+/* ---------- CONTACT ---------- */
+.contact {
+  padding: 7rem 0 4rem;
+  text-align: center;
+}
+.contact h2 {
+  font-family: var(--serif);
+  font-weight: 350;
+  font-variation-settings: "opsz" 144;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+  max-width: 18ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.contact h2 em { font-style: italic; color: var(--accent); }
+.contact p {
+  color: var(--ink-muted);
+  max-width: 48ch;
+  margin: 0 auto 2.5rem;
+  font-size: 1.05rem;
+}
+.contact-email {
+  display: inline-block;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-style: italic;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent-dim);
+  padding-bottom: 4px;
+  transition: border-color 0.25s ease;
+}
+.contact-email:hover { border-color: var(--accent); }
+
+/* ---------- FOOTER ---------- */
+footer {
+  border-top: 1px solid var(--rule);
+  padding: 2.5rem 0;
+  margin-top: 4rem;
+}
+footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+footer .copyright {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+}
+footer .social {
+  display: flex;
+  gap: 1.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+footer .social a {
+  color: var(--ink-muted);
+  transition: color 0.2s ease;
+}
+footer .social a:hover { color: var(--accent); }
+
+/* ---------- Stagger entrance ---------- */
+.fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+.fade-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-up:nth-child(2) { animation-delay: 0.25s; }
+.fade-up:nth-child(3) { animation-delay: 0.4s; }
+.fade-up:nth-child(4) { animation-delay: 0.55s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="wrap">
+    <a href="#" class="nav-brand">
+      <svg width="22" height="22" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="8" cy="20" r="5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <line x1="13" y1="20" x2="27" y2="20" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="32" cy="20" r="5" fill="currentColor"/>
+      </svg>
+      <span>Bayesian Beginnings</span>
+    </a>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#open-source">Open Source</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow fade-up">Consulting Practice</div>
+      <h1 class="hero-title fade-up">
+        Rigorous statistical modeling for <em>ambitious</em> research.
+      </h1>
+      <p class="hero-lede fade-up">
+        Bayesian Beginnings helps academic researchers and applied teams design, fit, and validate computational models — and build the reproducible pipelines that make the work last.
+      </p>
+      <a href="#contact" class="cta fade-up">
+        Start a conversation
+        <span class="cta-arrow">→</span>
+      </a>
+    </div>
+    <div class="hero-mark">
+      <!-- Stylized logo art (5 connection pairs in scattered arrangement) -->
+      <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" aria-label="Bayesian Beginnings logo">
+        <!-- Row 1 -->
+        <g>
+          <circle cx="60" cy="55" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+          <line x1="74" y1="55" x2="126" y2="55" stroke="#f3efe7" stroke-width="2"/>
+          <circle cx="140" cy="55" r="14" fill="#e8e3d8"/>
+        </g>
+        <!-- Row 2 -->
+        <g>
+          <circle cx="180" cy="110" r="14" fill="#e8e3d8"/>
+          <line x1="194" y1="110" x2="246" y2="110" stroke="#f3efe7" stroke-width="2"/>
+          <circle cx="260" cy="110" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+        </g>
+        <!-- Row 3 -->
+        <g>
+          <circle cx="40" cy="170" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+          <line x1="54" y1="170" x2="126" y2="170" stroke="#f3efe7" stroke-width="2"/>
+          <circle cx="140" cy="170" r="14" fill="#e8e3d8"/>
+        </g>
+        <!-- Row 4 -->
+        <g>
+          <circle cx="190" cy="225" r="14" fill="#e8e3d8"/>
+          <line x1="204" y1="225" x2="246" y2="225" stroke="#f3efe7" stroke-width="2"/>
+          <circle cx="260" cy="225" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+        </g>
+        <!-- Row 5 -->
+        <g>
+          <circle cx="40" cy="280" r="14" stroke="#f3efe7" stroke-width="2" fill="none"/>
+          <line x1="54" y1="280" x2="126" y2="280" stroke="#f3efe7" stroke-width="2"/>
+          <circle cx="140" cy="280" r="14" fill="#e8e3d8"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" fill="#c9a96e"/>
+  </svg>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="section-label">01 / Services</div>
+    <h2 class="section-title">A small set of things, done <em>carefully</em>.</h2>
+
+    <div class="services">
+      <div class="service">
+        <div class="service-num">→ 01</div>
+        <h3>Bayesian Model Development</h3>
+        <p>Custom hierarchical and generative models in Stan, PyMC, or brms — from sketch through prior/posterior predictive checks. For decision-making, learning, measurement, or whatever your domain calls for.</p>
+      </div>
+      <div class="service">
+        <div class="service-num">→ 02</div>
+        <h3>Computational Cognitive Modeling</h3>
+        <p>Reinforcement learning, drift-diffusion, evidence accumulation, and other process models. Bring me a behavioral paradigm and I'll help you formalize it, fit it, and check that it actually says what you think it says.</p>
+      </div>
+      <div class="service">
+        <div class="service-num">→ 03</div>
+        <h3>Reproducible Research Pipelines</h3>
+        <p>End-to-end workflows in R and Python using renv, uv, targets, and Docker. The kind of project structure that survives reviewer rounds, lab handoffs, and your own future memory.</p>
+      </div>
+      <div class="service">
+        <div class="service-num">→ 04</div>
+        <h3>Methodological Review & Strategy</h3>
+        <p>Second opinions on study design, model selection, and validation strategy. Useful before grant submissions, during revisions, or when a project's analytical plan needs a sober outside read.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="5" fill="#c9a96e"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+  </svg>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="section-label">02 / About</div>
+    <h2 class="section-title">The person behind the practice.</h2>
+
+    <div class="about-grid">
+      <div class="about-meta">
+        <strong>Principal</strong>
+        Nathaniel Haines, PhD
+
+        <strong>Training</strong>
+        PhD, Clinical & Mathematical Psychology<br>
+        The Ohio State University, 2021
+
+        <strong>Day Job</strong>
+        Senior Manager, Data Science<br>
+        Oscar Health
+
+        <strong>Located</strong>
+        Columbus, Ohio<br>
+        Remote engagements worldwide
+
+        <strong>Publications</strong>
+        20+ peer-reviewed papers in<br>
+        Computational Psychiatry,<br>
+        Cognitive Science, Clin Psych Sci
+      </div>
+
+      <div class="about-body">
+        <p>I've spent the last decade building Bayesian and computational models — first in academic psychology, then across health-tech and insurance. The thread connecting the work has always been the same: take a substantive question seriously enough to formalize it, then build something that can actually be fit, checked, and reused.</p>
+        <p>Bayesian Beginnings is the consulting side of that work. Most of my clients are researchers who have the domain expertise and the data, but want a collaborator who can move quickly between the modeling theory and the implementation — and who treats reproducibility as a design constraint, not an afterthought.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" fill="#c9a96e"/>
+  </svg>
+</div>
+
+<!-- OPEN SOURCE -->
+<section id="open-source">
+  <div class="wrap">
+    <div class="section-label">03 / Open Source</div>
+    <h2 class="section-title">Tools I've helped build, used by <em>thousands</em>.</h2>
+
+    <div class="os-grid">
+      <a class="os-card" href="https://github.com/CCS-Lab/hBayesDM" target="_blank" rel="noopener">
+        <div class="os-card-head">
+          <h3>hBayesDM</h3>
+          <span class="os-card-tag">R / Python</span>
+        </div>
+        <p>The hierarchical Bayesian modeling package for decision-making tasks — co-developed with the CCS Lab. Used across computational psychiatry, behavioral economics, and addiction research to fit dozens of established models with sane defaults.</p>
+        <span class="os-card-link">github →</span>
+      </a>
+
+      <a class="os-card" href="https://github.com/LedgerInvesting/bayesblend" target="_blank" rel="noopener">
+        <div class="os-card-head">
+          <h3>BayesBlend</h3>
+          <span class="os-card-tag">Python</span>
+        </div>
+        <p>A Python package for Bayesian model averaging and stacking — pseudo-BMA, hierarchical stacking, and related methods with a consistent API. Built originally at Ledger Investing for production forecasting workflows.</p>
+        <span class="os-card-link">github →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="5" fill="#c9a96e"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+  </svg>
+</div>
+
+<!-- PRIOR WORK -->
+<section id="work">
+  <div class="wrap">
+    <div class="section-label">04 / Selected Engagements</div>
+    <h2 class="section-title">A few places the work has gone.</h2>
+
+    <ul class="prior-list">
+      <li class="prior-item">
+        <div class="prior-client">Aivo Health</div>
+        <div class="prior-desc">Founding data scientist work — theoretical models of chronic pain, real-time inference pipelines, and behavioral measurement design for a digital therapeutics platform.</div>
+        <div class="prior-tag">Digital Health</div>
+      </li>
+      <li class="prior-item">
+        <div class="prior-client">Temple University</div>
+        <div class="prior-desc">Consulting on computational modeling of decision-making tasks in clinical research populations, including model specification, Stan implementation, and posterior interpretation.</div>
+        <div class="prior-tag">Academic</div>
+      </li>
+      <li class="prior-item">
+        <div class="prior-client">Ledger Investing</div>
+        <div class="prior-desc">Bayesian forecasting and state-space loss development models for insurance-linked securities — including the open-sourcing of BayesBlend for model stacking workflows.</div>
+        <div class="prior-tag">InsurTech</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" fill="#c9a96e"/>
+  </svg>
+</div>
+
+<!-- WRITING -->
+<section id="writing">
+  <div class="wrap">
+    <div class="section-label">05 / Writing</div>
+    <h2 class="section-title">Long-form thinking on modeling and measurement.</h2>
+
+    <a class="writing-block" href="https://haines-lab.com/post/" target="_blank" rel="noopener">
+      <div class="writing-block-text">
+        <h3>Selected essays at Haines Lab</h3>
+        <p>Most of my writing lives on my personal site — covering shrinkage estimation, the reliability paradox, generative models for psychology, and reproducible workflow tooling. A useful preview of how I think about problems before engagements begin.</p>
+      </div>
+      <span class="cta">Read essays <span class="cta-arrow">→</span></span>
+    </a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="wrap">
+    <div class="section-label" style="text-align:center; display:block;">06 / Contact</div>
+    <h2>Have a project worth <em>doing right</em>?</h2>
+    <p>The best starting point is an email with a few sentences on what you're working on, what stage it's at, and what you're hoping to figure out. I usually reply within a couple of days.</p>
+    <a class="contact-email" href="mailto:hello@bayesianbeginnings.com">hello@bayesianbeginnings.com</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <span class="copyright">© 2026 Bayesian Beginnings, LLC</span>
+    <div class="social">
+      <a href="https://www.linkedin.com/company/bayesian-beginnings" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/Nathaniel-Haines" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://haines-lab.com" target="_blank" rel="noopener">Haines Lab</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav border on scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  });
+</script>
+
+</body>
+</html>
