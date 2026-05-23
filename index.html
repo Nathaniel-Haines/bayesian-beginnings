@@ -3,6 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Theme init: runs synchronously before paint to avoid flash -->
+<script>
+  (function() {
+    var saved = null;
+    try { saved = localStorage.getItem('bb-theme'); } catch (e) {}
+    var theme = saved;
+    if (!theme) {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  })();
+</script>
+
 <title>Bayesian Beginnings — Consulting for Bayesian & Computational Modeling</title>
 
 <!-- Primary SEO meta -->
@@ -128,6 +143,7 @@
 
 <style>
 :root {
+  /* Dark theme (default) */
   --bg: #1a1a1a;
   --bg-2: #222222;
   --ink: #f3efe7;
@@ -135,6 +151,7 @@
   --rule: #3a3a3a;
   --accent: #c9a96e;
   --accent-dim: #8a7349;
+  --grain-opacity: 0.035;
 
   --serif: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
   --sans: 'General Sans', system-ui, -apple-system, sans-serif;
@@ -142,6 +159,34 @@
 
   --max-w: 1100px;
   --gutter: clamp(1.25rem, 4vw, 3rem);
+}
+
+/* Light theme — palette inherited from the Princeton deck:
+   warm cream paper, deep ink, crimson accent. */
+:root[data-theme="light"] {
+  --bg: #fdfcf8;
+  --bg-2: #f6f2e8;
+  --ink: #1a1a1a;
+  --ink-muted: #666;
+  --rule: #d8d4c8;
+  --accent: #8F2727;
+  --accent-dim: #B2182B;
+  --grain-opacity: 0;
+}
+
+/* Smooth transition when toggling */
+html { transition: background-color 0.4s ease; }
+body, .os-card, .writing-block, nav {
+  transition: background-color 0.4s ease, color 0.4s ease,
+              border-color 0.4s ease;
+}
+
+/* Register --logo-color so it can animate smoothly (color interpolation
+   requires @property; without it the value would snap, not fade). */
+@property --logo-color {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #c9a96e;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -167,8 +212,9 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 100;
-  opacity: 0.035;
+  opacity: var(--grain-opacity);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  transition: opacity 0.4s ease;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -187,9 +233,9 @@ nav {
   top: 0; left: 0; right: 0;
   z-index: 50;
   backdrop-filter: blur(12px);
-  background: rgba(26, 26, 26, 0.75);
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.4s ease;
 }
 nav.scrolled { border-bottom-color: var(--rule); }
 nav .wrap {
@@ -222,8 +268,31 @@ nav .wrap {
 }
 .nav-links a:hover { color: var(--ink); }
 @media (max-width: 640px) {
-  .nav-links { display: none; }
+  .nav-links a { display: none; }
+  .nav-links { gap: 0; }
 }
+
+/* Theme toggle — sun shows in dark mode, moon in light mode */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--ink-muted);
+  padding: 6px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  font-family: inherit;
+}
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink-muted);
+}
+.theme-toggle .icon-moon { display: none; }
+:root[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+:root[data-theme="light"] .theme-toggle .icon-moon { display: inline-block; }
 
 /* ---------- HERO ---------- */
 .hero {
@@ -315,11 +384,29 @@ h1.hero-title em {
   overflow: visible;
 }
 
+/* Each pair carries its own --logo-color, animated from accent → ink
+   on a delay tied to that pair's position in the cascade. The color
+   fade kicks in just as the filled circle finishes its scale-bounce,
+   so the row visibly "settles" into monochrome after estimation. */
+.logo-mark .pair {
+  --logo-color: var(--accent);
+  animation: settle-color 0.6s ease-out forwards;
+  /* Materialize completes at: 0.5 + i×0.22 + 0.6 + 0.45 = 1.55 + i×0.22
+     Start the color fade a hair before completion so it overlaps the
+     final 100ms of the bounce, making the transition feel continuous. */
+  animation-delay: calc(1.45s + var(--i) * 0.22s);
+}
+
+@keyframes settle-color {
+  from { --logo-color: var(--accent); }
+  to   { --logo-color: var(--ink); }
+}
+
 /* OPEN CIRCLES = observations / priors. Present from the start.
    fill: bg (not none) so bars passing behind don't show through. */
 .logo-mark .open {
   fill: var(--bg);
-  stroke: var(--ink);
+  stroke: var(--logo-color);
   stroke-width: 5;
   opacity: 0;
   animation: fade-in 0.6s ease-out forwards;
@@ -330,7 +417,7 @@ h1.hero-title em {
    Rows 1,3,5 (i=0,2,4): open on LEFT, draw L→R, dashoffset goes +len → 0.
    Rows 2,4 (i=1,3): open on RIGHT, draw R→L, dashoffset goes -len → 0. */
 .logo-mark .bar {
-  stroke: var(--ink);
+  stroke: var(--logo-color);
   stroke-width: 5;
   stroke-linecap: round;
   stroke-dasharray: 600;
@@ -347,7 +434,7 @@ h1.hero-title em {
 /* FILLED CIRCLES = posterior estimates. Materialize at bar's destination
    after the bar finishes drawing. Brief scale-in with overshoot. */
 .logo-mark .fill {
-  fill: var(--ink);
+  fill: var(--logo-color);
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
@@ -373,6 +460,10 @@ h1.hero-title em {
 /* HOVER: replay the initial estimation sequence.
    We use a .replay class (toggled by JS) with distinct animation names
    so the browser actually registers the change and restarts. */
+.hero-mark.replay .logo-mark .pair {
+  animation: settle-color-replay 0.6s ease-out forwards;
+  animation-delay: calc(1.45s + var(--i) * 0.22s);
+}
 .hero-mark.replay .logo-mark .open {
   animation: fade-in-replay 0.6s ease-out forwards;
   animation-delay: calc(var(--i) * 0.08s);
@@ -409,12 +500,18 @@ h1.hero-title em {
   70%  { opacity: 1; transform: scale(1.15); }
   100% { opacity: 1; transform: scale(1); }
 }
+@keyframes settle-color-replay {
+  from { --logo-color: var(--accent); }
+  to   { --logo-color: var(--ink); }
+}
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
+  .logo-mark .pair { --logo-color: var(--ink); animation: none; }
   .logo-mark .open,
   .logo-mark .fill { opacity: 1; animation: none; }
   .logo-mark .bar { stroke-dashoffset: 0; animation: none; }
+  .hero-mark.replay .logo-mark .pair,
   .hero-mark.replay .logo-mark .open,
   .hero-mark.replay .logo-mark .fill,
   .hero-mark.replay .logo-mark .bar { animation: none; }
@@ -425,6 +522,7 @@ h1.hero-title em {
   display: flex;
   justify-content: center;
   padding: 4rem 0;
+  color: var(--accent);
 }
 .divider svg { opacity: 0.4; }
 
@@ -889,6 +987,17 @@ footer .social a:hover { color: var(--accent); }
       <a href="#work">Work</a>
       <a href="#publications">Publications</a>
       <a href="#contact">Contact</a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme" type="button">
+        <!-- Sun icon (shown in dark mode, click to go light) -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+        <!-- Moon icon (shown in light mode, click to go dark) -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
     </div>
   </div>
 </nav>
@@ -959,9 +1068,9 @@ footer .social a:hover { color: var(--accent); }
 <!-- DIVIDER -->
 <div class="divider">
   <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
-    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
-    <circle cx="70" cy="10" r="5" fill="#c9a96e"/>
+    <circle cx="10" cy="10" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="currentColor" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" fill="currentColor"/>
   </svg>
 </div>
 
@@ -999,9 +1108,9 @@ footer .social a:hover { color: var(--accent); }
 <!-- DIVIDER -->
 <div class="divider">
   <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="5" fill="#c9a96e"/>
-    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
-    <circle cx="70" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+    <circle cx="10" cy="10" r="5" fill="currentColor"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="currentColor" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
   </svg>
 </div>
 
@@ -1045,9 +1154,9 @@ footer .social a:hover { color: var(--accent); }
 <!-- DIVIDER -->
 <div class="divider">
   <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
-    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
-    <circle cx="70" cy="10" r="5" fill="#c9a96e"/>
+    <circle cx="10" cy="10" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="currentColor" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" fill="currentColor"/>
   </svg>
 </div>
 
@@ -1088,9 +1197,9 @@ footer .social a:hover { color: var(--accent); }
 <!-- DIVIDER -->
 <div class="divider">
   <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="5" fill="#c9a96e"/>
-    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
-    <circle cx="70" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+    <circle cx="10" cy="10" r="5" fill="currentColor"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="currentColor" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
   </svg>
 </div>
 
@@ -1123,9 +1232,9 @@ footer .social a:hover { color: var(--accent); }
 <!-- DIVIDER -->
 <div class="divider">
   <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
-    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
-    <circle cx="70" cy="10" r="5" fill="#c9a96e"/>
+    <circle cx="10" cy="10" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="currentColor" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" fill="currentColor"/>
   </svg>
 </div>
 
@@ -1196,9 +1305,9 @@ footer .social a:hover { color: var(--accent); }
 <!-- DIVIDER -->
 <div class="divider">
   <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" r="5" fill="#c9a96e"/>
-    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
-    <circle cx="70" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+    <circle cx="10" cy="10" r="5" fill="currentColor"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="currentColor" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" stroke="currentColor" stroke-width="1.2" fill="none"/>
   </svg>
 </div>
 
@@ -1278,6 +1387,21 @@ footer .social a:hover { color: var(--accent); }
     if (window.scrollY > 20) nav.classList.add('scrolled');
     else nav.classList.remove('scrolled');
   });
+
+  // Theme toggle: swap data-theme on <html> and persist choice
+  const toggle = document.getElementById('theme-toggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const next = isLight ? 'dark' : 'light';
+      if (next === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try { localStorage.setItem('bb-theme', next); } catch (e) {}
+    });
+  }
 
   // Replay logo animation on hover. Lock during playback so re-entering
   // mid-sequence doesn't cut it off; total runtime ~1.95s.
