@@ -1388,7 +1388,25 @@ footer .social a:hover { color: var(--accent); }
     else nav.classList.remove('scrolled');
   });
 
-  // Theme toggle: swap data-theme on <html> and persist choice
+  // Replay logo animation. Lock during playback so re-triggers
+  // mid-sequence don't cut it off; total runtime ~3s with color settle.
+  const heroMark = document.querySelector('.hero-mark');
+  let replaying = false;
+  function replayLogo() {
+    if (!heroMark || replaying) return;
+    replaying = true;
+    heroMark.classList.remove('replay');
+    // Force reflow so the browser registers the class removal
+    // before re-adding it, ensuring the animation restarts.
+    void heroMark.offsetWidth;
+    heroMark.classList.add('replay');
+    setTimeout(() => { replaying = false; }, 3000);
+  }
+  if (heroMark) {
+    heroMark.addEventListener('mouseenter', replayLogo);
+  }
+
+  // Theme toggle: swap data-theme on <html>, persist choice, replay logo
   const toggle = document.getElementById('theme-toggle');
   if (toggle) {
     toggle.addEventListener('click', () => {
@@ -1400,23 +1418,7 @@ footer .social a:hover { color: var(--accent); }
         document.documentElement.removeAttribute('data-theme');
       }
       try { localStorage.setItem('bb-theme', next); } catch (e) {}
-    });
-  }
-
-  // Replay logo animation on hover. Lock during playback so re-entering
-  // mid-sequence doesn't cut it off; total runtime ~1.95s.
-  const heroMark = document.querySelector('.hero-mark');
-  let replaying = false;
-  if (heroMark) {
-    heroMark.addEventListener('mouseenter', () => {
-      if (replaying) return;
-      replaying = true;
-      heroMark.classList.remove('replay');
-      // Force reflow so the browser registers the class removal
-      // before re-adding it, ensuring the animation restarts.
-      void heroMark.offsetWidth;
-      heroMark.classList.add('replay');
-      setTimeout(() => { replaying = false; }, 1950);
+      replayLogo();
     });
   }
 </script>
