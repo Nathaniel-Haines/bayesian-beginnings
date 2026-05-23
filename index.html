@@ -10,6 +10,15 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%231a1a1a' rx='8'/><g><circle cx='16' cy='22' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/><line x1='21' y1='22' x2='38' y2='22' stroke='%23f3efe7' stroke-width='2'/><circle cx='43' cy='22' r='5' fill='%23f3efe7'/><circle cx='21' cy='42' r='5' fill='%23f3efe7'/><line x1='26' y1='42' x2='43' y2='42' stroke='%23f3efe7' stroke-width='2'/><circle cx='48' cy='42' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/></g></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%231a1a1a' rx='8'/><g><circle cx='16' cy='22' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/><line x1='21' y1='22' x2='38' y2='22' stroke='%23f3efe7' stroke-width='2'/><circle cx='43' cy='22' r='5' fill='%23f3efe7'/><circle cx='21' cy='42' r='5' fill='%23f3efe7'/><line x1='26' y1='42' x2='43' y2='42' stroke='%23f3efe7' stroke-width='2'/><circle cx='48' cy='42' r='5' stroke='%23f3efe7' stroke-width='2' fill='none'/></g></svg>">
 
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8HC6WCLBES"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-8HC6WCLBES');
+</script>
+
 <!-- Fonts: Fraunces (variable serif) + General Sans (body) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -471,6 +480,11 @@ h2.section-title em {
   margin-bottom: 1.5rem;
   flex: 1;
 }
+.os-card-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
 .os-card-link {
   font-family: var(--mono);
   font-size: 0.78rem;
@@ -479,10 +493,12 @@ h2.section-title em {
   letter-spacing: 0.15em;
   border-bottom: 1px solid var(--accent-dim);
   padding-bottom: 2px;
-  align-self: flex-start;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
-.os-card-link:hover { border-color: var(--accent); }
+.os-card-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 
 /* ---------- PRIOR WORK ---------- */
 .prior-list {
@@ -524,33 +540,146 @@ h2.section-title em {
 }
 @media (max-width: 720px) { .prior-tag { text-align: left; } }
 
-/* ---------- WRITING ---------- */
-.writing-block {
-  border: 1px solid var(--rule);
-  padding: 3rem;
-  background: var(--bg-2);
+/* PUBLICATIONS — same skeleton as prior-list, with paper titles as links
+   and a metadata line for authors + journal. */
+.pub-item .prior-desc {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 0.4rem;
 }
-@media (max-width: 720px) {
-  .writing-block {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 2rem;
-  }
-}
-.writing-block-text h3 {
+.pub-link {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  display: inline;
 }
-.writing-block-text p {
+.pub-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent-dim);
+}
+.pub-meta {
+  font-family: var(--mono);
+  font-size: 0.75rem;
   color: var(--ink-muted);
-  max-width: 50ch;
-  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+.pub-meta em {
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* ---------- WRITING & TALKS ---------- */
+.writing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+@media (max-width: 800px) {
+  .writing-grid { grid-template-columns: 1fr; }
+}
+.writing-col {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.writing-col:first-child {
+  padding-right: 3rem;
+}
+.writing-col:last-child {
+  padding-left: 3rem;
+  border-left: 1px solid var(--rule);
+}
+@media (max-width: 800px) {
+  .writing-col:first-child,
+  .writing-col:last-child {
+    padding: 2rem 0;
+    border-left: none;
+  }
+}
+.writing-col-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.writing-col-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+.writing-col-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.writing-col-lede {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--ink);
+  margin-bottom: 1.75rem;
+  max-width: 38ch;
+}
+.writing-col-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent-dim);
+  padding-bottom: 4px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.writing-col-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Talk list — each row is title + venue/year */
+.talk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.talk-item {
+  padding: 1rem 0;
+  border-top: 1px solid var(--rule);
+}
+.talk-item:first-child { border-top: none; padding-top: 0; }
+.talk-item:last-child { padding-bottom: 0; }
+.talk-link {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  display: inline;
+}
+.talk-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent-dim);
+}
+.talk-meta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+  margin-top: 0.4rem;
 }
 
 /* ---------- CONTACT ---------- */
@@ -657,6 +786,7 @@ footer .social a:hover { color: var(--accent); }
       <a href="#about">About</a>
       <a href="#open-source">Open Source</a>
       <a href="#work">Work</a>
+      <a href="#publications">Publications</a>
       <a href="#contact">Contact</a>
     </div>
   </div>
@@ -827,23 +957,29 @@ footer .social a:hover { color: var(--accent); }
     <h2 class="section-title">Tools I've helped build, used by <em>thousands</em>.</h2>
 
     <div class="os-grid">
-      <a class="os-card" href="https://github.com/CCS-Lab/hBayesDM" target="_blank" rel="noopener">
+      <div class="os-card">
         <div class="os-card-head">
           <h3>hBayesDM</h3>
           <span class="os-card-tag">R / Python</span>
         </div>
         <p>The hierarchical Bayesian modeling package for decision-making tasks — co-developed with the CCS Lab. Used across computational psychiatry, behavioral economics, and addiction research to fit dozens of established models with sane defaults.</p>
-        <span class="os-card-link">github →</span>
-      </a>
+        <div class="os-card-links">
+          <a class="os-card-link" href="https://github.com/CCS-Lab/hBayesDM" target="_blank" rel="noopener">github →</a>
+          <a class="os-card-link" href="https://doi.org/10.1162/CPSY_a_00002" target="_blank" rel="noopener">paper →</a>
+        </div>
+      </div>
 
-      <a class="os-card" href="https://github.com/LedgerInvesting/bayesblend" target="_blank" rel="noopener">
+      <div class="os-card">
         <div class="os-card-head">
           <h3>BayesBlend</h3>
           <span class="os-card-tag">Python</span>
         </div>
         <p>A Python package for Bayesian model averaging and stacking — pseudo-BMA, hierarchical stacking, and related methods with a consistent API. Built originally at Ledger Investing for production forecasting workflows.</p>
-        <span class="os-card-link">github →</span>
-      </a>
+        <div class="os-card-links">
+          <a class="os-card-link" href="https://github.com/LedgerInvesting/bayesblend" target="_blank" rel="noopener">github →</a>
+          <a class="os-card-link" href="https://arxiv.org/abs/2405.00158" target="_blank" rel="noopener">paper →</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -892,26 +1028,130 @@ footer .social a:hover { color: var(--accent); }
   </svg>
 </div>
 
-<!-- WRITING -->
+<!-- PUBLICATIONS -->
+<section id="publications">
+  <div class="wrap">
+    <div class="section-label">05 / Publications</div>
+    <h2 class="section-title">Peer-reviewed work from <em>client engagements</em>.</h2>
+
+    <ul class="prior-list">
+      <li class="prior-item pub-item">
+        <div class="prior-client">2025</div>
+        <div class="prior-desc">
+          <a class="pub-link" href="https://doi.org/10.1037/met0000674" target="_blank" rel="noopener">A tutorial on using generative models to advance psychological science: Lessons from the reliability paradox</a>
+          <div class="pub-meta">Haines, Kvam, Irving, Smith, Beauchaine, Pitt, Ahn, Turner · <em>Psychological Methods</em></div>
+        </div>
+        <div class="prior-tag">Cognitive Psychometrics</div>
+      </li>
+
+      <li class="prior-item pub-item">
+        <div class="prior-client">2025</div>
+        <div class="prior-desc">
+          <a class="pub-link" href="https://acamh.onlinelibrary.wiley.com/doi/10.1111/jcpp.70086" target="_blank" rel="noopener">Reward-specific learning parameters change across normative adolescent development and are blunted in youth with high risk for depression</a>
+          <div class="pub-meta">Sullivan-Toole, Haynes, Haines, Olino · <em>Journal of Child Psychology and Psychiatry</em></div>
+        </div>
+        <div class="prior-tag">Computational Psychiatry</div>
+      </li>
+
+      <li class="prior-item pub-item">
+        <div class="prior-client">2025</div>
+        <div class="prior-desc">
+          <a class="pub-link" href="https://link.springer.com/article/10.3758/s13415-025-01331-y" target="_blank" rel="noopener">Reward and punishment learning among people with a lifetime history of anxiety, depression, and substance use disorder</a>
+          <div class="pub-meta">Haynes, Haines, Sullivan-Toole, Olino · <em>Cognitive, Affective, &amp; Behavioral Neuroscience</em></div>
+        </div>
+        <div class="prior-tag">Computational Psychiatry</div>
+      </li>
+
+      <li class="prior-item pub-item">
+        <div class="prior-client">2024</div>
+        <div class="prior-desc">
+          <a class="pub-link" href="https://arxiv.org/abs/2407.14666" target="_blank" rel="noopener">A Bayesian workflow for securitizing casualty insurance risk</a>
+          <div class="pub-meta">Haines, Goold, Shoun · <em>arXiv preprint</em></div>
+        </div>
+        <div class="prior-tag">Actuarial Science</div>
+      </li>
+
+      <li class="prior-item pub-item">
+        <div class="prior-client">2024</div>
+        <div class="prior-desc">
+          <a class="pub-link" href="https://link.springer.com/article/10.3758/s13415-024-01197-6" target="_blank" rel="noopener">Test-retest reliability of the play-or-pass version of the Iowa Gambling Task</a>
+          <div class="pub-meta">Haynes, Haines, Sullivan-Toole, Olino · <em>Cognitive, Affective, &amp; Behavioral Neuroscience</em></div>
+        </div>
+        <div class="prior-tag">Cognitive Psychometrics</div>
+      </li>
+
+      <li class="prior-item pub-item">
+        <div class="prior-client">2023</div>
+        <div class="prior-desc">
+          <a class="pub-link" href="https://www.sciencedirect.com/science/article/abs/pii/S2451902223000022" target="_blank" rel="noopener">From classical methods to generative models: Tackling the unreliability of neuroscientific measures in mental health research</a>
+          <div class="pub-meta">Haines, Sullivan-Toole, Olino · <em>Biological Psychiatry: Cognitive Neuroscience and Neuroimaging</em></div>
+        </div>
+        <div class="prior-tag">Cognitive Psychometrics</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="5" fill="#c9a96e"/>
+    <line x1="15" y1="10" x2="65" y2="10" stroke="#c9a96e" stroke-width="1"/>
+    <circle cx="70" cy="10" r="5" stroke="#c9a96e" stroke-width="1.2" fill="none"/>
+  </svg>
+</div>
+
+<!-- WRITING & TALKS -->
 <section id="writing">
   <div class="wrap">
-    <div class="section-label">05 / Writing</div>
-    <h2 class="section-title">Long-form thinking on modeling and measurement.</h2>
+    <div class="section-label">06 / Writing &amp; Talks</div>
+    <h2 class="section-title">Long-form thinking, made <em>public</em>.</h2>
 
-    <a class="writing-block" href="https://haines-lab.com/post/" target="_blank" rel="noopener">
-      <div class="writing-block-text">
-        <h3>Selected essays at Haines Lab</h3>
-        <p>Most of my writing lives on my personal site — covering shrinkage estimation, the reliability paradox, generative models for psychology, and reproducible workflow tooling. A useful preview of how I think about problems before engagements begin.</p>
+    <div class="writing-grid">
+      <!-- Essays column -->
+      <div class="writing-col">
+        <div class="writing-col-head">
+          <span class="writing-col-label">Essays</span>
+          <span class="writing-col-rule"></span>
+        </div>
+        <p class="writing-col-lede">
+          Most of my long-form writing lives on my personal site &mdash; covering shrinkage estimation, the reliability paradox, generative models for psychology, and the tooling that makes reproducible workflows actually reproducible.
+        </p>
+        <a class="writing-col-link" href="https://haines-lab.com/post/" target="_blank" rel="noopener">
+          Read essays at Haines Lab
+          <span class="cta-arrow">→</span>
+        </a>
       </div>
-      <span class="cta">Read essays <span class="cta-arrow">→</span></span>
-    </a>
+
+      <!-- Talks column -->
+      <div class="writing-col">
+        <div class="writing-col-head">
+          <span class="writing-col-label">Talks</span>
+          <span class="writing-col-rule"></span>
+        </div>
+        <ul class="talk-list">
+          <li class="talk-item">
+            <a class="talk-link" href="https://youtu.be/hSGrDXJ2L7M" target="_blank" rel="noopener">Easy Model Blending using Pseudo-Bayesian Model Averaging in Python</a>
+            <div class="talk-meta">PyData · 2024</div>
+          </li>
+          <li class="talk-item">
+            <a class="talk-link" href="https://youtu.be/o90ogqUv4AA" target="_blank" rel="noopener">An Introduction to Bayesian Data Analysis</a>
+            <div class="talk-meta">OSU Cognitive Proseminar · 2021</div>
+          </li>
+          <li class="talk-item">
+            <a class="talk-link" href="https://youtu.be/7zRgDwZ-BJA" target="_blank" rel="noopener">Generative Models Can Advance the Social, Behavioral, and Brain Sciences</a>
+            <div class="talk-meta">UCL Institute of Cognitive Neuroscience · 2020</div>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- CONTACT -->
 <section id="contact" class="contact">
   <div class="wrap">
-    <div class="section-label" style="text-align:center; display:block;">06 / Contact</div>
+    <div class="section-label" style="text-align:center; display:block;">07 / Contact</div>
     <h2>Have a project worth <em>doing right</em>?</h2>
     <p>The best starting point is an email with a few sentences on what you're working on, what stage it's at, and what you're hoping to figure out. I usually reply within a couple of days.</p>
     <a class="contact-email" href="mailto:nathaniel.b.haines@gmail.com">nathaniel.b.haines@gmail.com</a>
