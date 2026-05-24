@@ -270,6 +270,14 @@ nav .wrap {
 @media (max-width: 640px) {
   .nav-links a { display: none; }
   .nav-links { gap: 0; }
+  /* Tighter brand at narrow widths so the toggle stays in view */
+  .nav-brand { font-size: 0.95rem; gap: 8px; }
+  /* Tighter horizontal gutter inside the nav row only */
+  nav .wrap { padding-left: 1rem; padding-right: 1rem; }
+}
+@media (max-width: 380px) {
+  /* Very narrow screens: hide the wordmark, keep the logo glyph + toggle */
+  .nav-brand span { display: none; }
 }
 
 /* Theme toggle — sun shows in dark mode, moon in light mode */
@@ -907,14 +915,17 @@ h2.section-title em {
 }
 .contact-email {
   display: inline-block;
+  max-width: 100%;
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-size: clamp(1rem, 4.5vw, 2.2rem);
   font-style: italic;
   color: var(--accent);
   border-bottom: 1px solid var(--accent-dim);
   padding-bottom: 4px;
   transition: border-color 0.25s ease;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .contact-email:hover { border-color: var(--accent); }
 
