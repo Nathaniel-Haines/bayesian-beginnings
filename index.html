@@ -854,6 +854,75 @@ h2.section-title em {
   border-bottom-color: var(--accent);
 }
 
+/* Essay cards — thumbnail + title + pull-quote, three to the column */
+.essay-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.essay-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+.essay-card:hover {
+  transform: translateX(2px);
+}
+.essay-thumb {
+  flex: 0 0 84px;
+  width: 84px;
+  height: 84px;
+  display: block;
+  border: 1px solid var(--rule);
+  background: var(--bg-2);
+  border-radius: 2px;
+  color: var(--ink-muted);
+  transition: color 0.25s ease, border-color 0.25s ease, background-color 0.4s ease;
+}
+.essay-thumb svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.essay-card:hover .essay-thumb {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+.essay-body { flex: 1; min-width: 0; }
+.essay-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 1.02rem;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  margin-bottom: 0.45rem;
+  color: var(--ink);
+}
+.essay-pull {
+  font-family: var(--sans);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  margin-bottom: 0.55rem;
+}
+.essay-link {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-muted);
+  transition: color 0.2s ease;
+}
+.essay-card:hover .essay-link {
+  color: var(--accent);
+}
+
 /* Talk list — each row is title + venue/year */
 .talk-list {
   list-style: none;
@@ -1338,17 +1407,118 @@ footer .social a:hover { color: var(--accent); }
     <h2 class="section-title">Long-form thinking, made <em>public</em>.</h2>
 
     <div class="writing-grid">
-      <!-- Essays column -->
+      <!-- Essays column — Selected Thinking with three curated essays -->
       <div class="writing-col">
         <div class="writing-col-head">
-          <span class="writing-col-label">Essays</span>
+          <span class="writing-col-label">Selected Thinking</span>
           <span class="writing-col-rule"></span>
         </div>
-        <p class="writing-col-lede">
-          Most of my long-form writing lives on my personal site &mdash; covering shrinkage estimation, the reliability paradox, generative models for psychology, and the tooling that makes reproducible workflows actually reproducible.
-        </p>
+
+        <ul class="essay-list">
+          <li>
+            <a class="essay-card" href="https://haines-lab.com/post/how-to-estimate-a-mean-and-what-it-means-for-science/" target="_blank" rel="noopener">
+              <span class="essay-thumb" aria-hidden="true">
+                <!-- thumb: symmetric posterior. Vertical estimate line and baseline
+                     rendered BEHIND the curve so the bell reads as continuous and
+                     symmetric. The filled point estimate sits to the RIGHT of the
+                     peak (~60th percentile) — the truth isn't always at the mode. -->
+                <svg viewBox="0 0 200 200" fill="none">
+                  <line x1="20" y1="160" x2="180" y2="160" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+                  <line x1="115" y1="40" x2="115" y2="170" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                  <line x1="110" y1="170" x2="120" y2="170" stroke="currentColor" stroke-width="2.5"/>
+                  <path d="M 20 150 C 50 150, 68 145, 80 125 C 89 110, 94 80, 100 75 C 106 80, 111 110, 120 125 C 132 145, 150 150, 180 150"
+                        stroke="currentColor" stroke-width="2.4"/>
+                  <circle cx="115" cy="122" r="8" fill="currentColor"/>
+                </svg>
+              </span>
+              <div class="essay-body">
+                <h3 class="essay-title">How to Estimate a Mean, and What It Means for Science</h3>
+                <p class="essay-pull">James-Stein, classical true-score theory, empirical Bayes, ridge regression, and hierarchical models all converge on the same idea: shrink toward the group. Here's why that matters.</p>
+                <span class="essay-link">Read on Haines Lab <span class="cta-arrow">→</span></span>
+              </div>
+            </a>
+          </li>
+
+          <li>
+            <a class="essay-card" href="https://haines-lab.com/post/thinking-generatively-why-do-we-use-atheoretical-statistical-models-to-test-substantive-psychological-theories/" target="_blank" rel="noopener">
+              <span class="essay-thumb" aria-hidden="true">
+                <!-- thumb: shallow-sloped regression line; observations shrunk
+                     DIAGONALLY toward the line (perpendicular projection),
+                     stopping partway (60% shrinkage). Connectors are trimmed
+                     so no stroke is visible inside either circle. -->
+                <svg viewBox="0 0 200 200" fill="none">
+                  <line x1="30" y1="145" x2="170" y2="65" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 4" opacity="0.5"/>
+                  <g stroke="currentColor" stroke-width="1.5" opacity="0.55" stroke-linecap="round">
+                    <line x1="53.7"  y1="61.5"  x2="67.1"  y2="84.9"/>
+                    <line x1="36.3"  y1="168.5" x2="34.0"  y2="164.5"/>
+                    <line x1="118.7" y1="41.5"  x2="127.7" y2="57.1"/>
+                    <line x1="86.3"  y1="143.5" x2="83.1"  y2="137.9"/>
+                    <line x1="173.7" y1="41.5"  x2="174.5" y2="42.9"/>
+                    <line x1="156.3" y1="148.5" x2="141.4" y2="122.5"/>
+                  </g>
+                  <g stroke="currentColor" stroke-width="2.2" fill="none">
+                    <circle cx="50"  cy="55"  r="6"/>
+                    <circle cx="40"  cy="175" r="6"/>
+                    <circle cx="115" cy="35"  r="6"/>
+                    <circle cx="90"  cy="150" r="6"/>
+                    <circle cx="170" cy="35"  r="6"/>
+                    <circle cx="160" cy="155" r="6"/>
+                  </g>
+                  <g fill="currentColor">
+                    <circle cx="70.3"  cy="90.5"  r="6"/>
+                    <circle cx="30.8"  cy="158.8" r="6"/>
+                    <circle cx="130.9" cy="62.8"  r="6"/>
+                    <circle cx="79.8"  cy="132.2" r="6"/>
+                    <circle cx="177.8" cy="48.6"  r="6"/>
+                    <circle cx="138.2" cy="116.9" r="6"/>
+                  </g>
+                </svg>
+              </span>
+              <div class="essay-body">
+                <h3 class="essay-title">Thinking Generatively: Why Do We Use Atheoretical Statistical Models to Test Substantive Psychological Theories?</h3>
+                <p class="essay-pull">Behavioral data deserves models that take its data-generating process seriously. Summary statistics and two-stage analyses produce an impoverished view of the individual differences that actually matter.</p>
+                <span class="essay-link">Read on Haines Lab <span class="cta-arrow">→</span></span>
+              </div>
+            </a>
+          </li>
+
+          <li>
+            <a class="essay-card" href="https://haines-lab.com/post/part-2-the-implicit-association-test/" target="_blank" rel="noopener">
+              <span class="essay-thumb" aria-hidden="true">
+                <!-- thumb: measurement model — two latent constructs with observed indicators -->
+                <svg viewBox="0 0 200 200" fill="none">
+                  <circle cx="55"  cy="55"  r="14" fill="currentColor"/>
+                  <circle cx="145" cy="55"  r="14" fill="currentColor"/>
+                  <path d="M 69 55 Q 100 25 131 55" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <g stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6">
+                    <line x1="55"  y1="69"  x2="30"  y2="120"/>
+                    <line x1="55"  y1="69"  x2="55"  y2="120"/>
+                    <line x1="55"  y1="69"  x2="80"  y2="120"/>
+                    <line x1="145" y1="69"  x2="120" y2="120"/>
+                    <line x1="145" y1="69"  x2="145" y2="120"/>
+                    <line x1="145" y1="69"  x2="170" y2="120"/>
+                  </g>
+                  <g stroke="currentColor" stroke-width="2.2" fill="none">
+                    <rect x="22"  y="120" width="16" height="16"/>
+                    <rect x="47"  y="120" width="16" height="16"/>
+                    <rect x="72"  y="120" width="16" height="16"/>
+                    <rect x="112" y="120" width="16" height="16"/>
+                    <rect x="137" y="120" width="16" height="16"/>
+                    <rect x="162" y="120" width="16" height="16"/>
+                  </g>
+                </svg>
+              </span>
+              <div class="essay-body">
+                <h3 class="essay-title">A Series on Building Formal Models of Classic Psychological Effects: Part 2, Implicit Attitudes — Are They Real?</h3>
+                <p class="essay-pull">Implicit and explicit attitudes are both latent — we only observe noisy indicators of each. What does it actually take to recover the relationship between them, and what happens when the IAT can't?</p>
+                <span class="essay-link">Read on Haines Lab <span class="cta-arrow">→</span></span>
+              </div>
+            </a>
+          </li>
+        </ul>
+
         <a class="writing-col-link" href="https://haines-lab.com/post/" target="_blank" rel="noopener">
-          Read essays at Haines Lab
+          Browse all essays
           <span class="cta-arrow">→</span>
         </a>
       </div>
